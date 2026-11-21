@@ -20,6 +20,19 @@ jobs:
       - name: Unpack Android project
         run: unzip -q NfcLab_project.zip -d .
 
+      - name: Fix HCE resource descriptions
+        run: |
+          mkdir -p NfcLab/app/src/main/res/values
+          cat > NfcLab/app/src/main/res/values/strings.xml <<'EOF'
+          <?xml version="1.0" encoding="utf-8"?>
+          <resources>
+              <string name="nfc_lab_demo_card">NFC Lab demo card</string>
+              <string name="nfc_lab_test_aid">NFC Lab test AID</string>
+          </resources>
+          EOF
+          sed -i 's/android:description="NFC Lab demo card"/android:description="@string\/nfc_lab_demo_card"/' NfcLab/app/src/main/res/xml/hce_service.xml
+          sed -i 's/android:description="NFC Lab test AID"/android:description="@string\/nfc_lab_test_aid"/' NfcLab/app/src/main/res/xml/hce_service.xml
+
       - name: Setup Java
         uses: actions/setup-java@v5
         with:
