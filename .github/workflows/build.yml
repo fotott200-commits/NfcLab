@@ -99,6 +99,22 @@ jobs:
       - name: Build APK
         run: gradle -p NfcLab assembleDebug
 
+      - name: Inspect APK compatibility and signature
+        shell: bash
+        run: |
+          APK="NfcLab/app/build/outputs/apk/debug/app-debug.apk"
+          AAPT="$ANDROID_HOME/build-tools/35.0.0/aapt"
+          APKSIGNER="$ANDROID_HOME/build-tools/35.0.0/apksigner"
+          ZIPALIGN="$ANDROID_HOME/build-tools/35.0.0/zipalign"
+          echo "=== APK manifest metadata ==="
+          "$AAPT" dump badging "$APK" | grep -E "^(package:|sdkVersion:|targetSdkVersion:|native-code:|uses-feature:)"
+          echo "=== APK signature verification ==="
+          "$APKSIGNER" verify --verbose --print-certs "$APK"
+          echo "=== ZIP alignment ==="
+          "$ZIPALIGN" -c -v 4 "$APK"
+          echo "=== APK file ==="
+          ls -lh "$APK"
+
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
